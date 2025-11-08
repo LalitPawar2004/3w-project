@@ -1,4 +1,3 @@
-// src/pages/Login.js
 import React, { useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { TextField, Button, Container, Typography, Box } from "@mui/material";
@@ -6,10 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
@@ -19,10 +15,10 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axiosInstance.post("/api/users/login", formData);
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("username", res.data.username);
-      setMessage("Login successful!");
+      const { data } = await axiosInstance.post("/api/users/login", formData);
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("username", data.username);
+      setMessage("Login successful! Redirecting...");
       setTimeout(() => navigate("/feed"), 1000);
     } catch (error) {
       setMessage(error.response?.data?.message || "Login failed!");
@@ -35,22 +31,8 @@ const Login = () => {
         Login
       </Typography>
       <Box component="form" onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Email"
-          name="email"
-          type="email"
-          margin="normal"
-          onChange={handleChange}
-        />
-        <TextField
-          fullWidth
-          label="Password"
-          name="password"
-          type="password"
-          margin="normal"
-          onChange={handleChange}
-        />
+        <TextField fullWidth label="Email" name="email" type="email" margin="normal" onChange={handleChange} required />
+        <TextField fullWidth label="Password" name="password" type="password" margin="normal" onChange={handleChange} required />
         <Button type="submit" fullWidth variant="contained" sx={{ mt: 2 }}>
           Login
         </Button>

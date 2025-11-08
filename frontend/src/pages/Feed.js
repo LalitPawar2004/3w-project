@@ -12,15 +12,15 @@ const Feed = () => {
   const fetchPosts = async (pageNum = 1) => {
     try {
       setLoading(true);
-      const res = await axiosInstance.get(`/api/posts?page=${pageNum}&limit=5`);
-      if (res.data.length === 0) {
+      const { data } = await axiosInstance.get(`/api/posts?page=${pageNum}&limit=5`);
+      if (data.length === 0) {
         setHasMore(false);
       } else {
-        setPosts((prev) => [...prev, ...res.data]);
+        setPosts((prev) => [...prev, ...data]);
       }
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching posts:", error);
+    } finally {
       setLoading(false);
     }
   };
@@ -29,15 +29,10 @@ const Feed = () => {
     fetchPosts(page);
   }, [page]);
 
-  const loadMore = () => {
-    setPage((prev) => prev + 1);
-  };
+  const loadMore = () => setPage((prev) => prev + 1);
 
-  // ✅ Function to update individual posts after like/comment
   const handlePostUpdate = (updatedPost) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((p) => (p._id === updatedPost._id ? updatedPost : p))
-    );
+    setPosts((prevPosts) => prevPosts.map((p) => (p._id === updatedPost._id ? updatedPost : p)));
   };
 
   return (
@@ -46,29 +41,16 @@ const Feed = () => {
         🌍 Social Feed
       </Typography>
 
-      {posts.length === 0 && !loading && (
-        <Typography>No posts yet. Be the first to create one!</Typography>
-      )}
+      {posts.length === 0 && !loading && <Typography>No posts yet. Be the first to create one!</Typography>}
 
       {posts.map((post) => (
-        <PostCard
-          key={post._id}
-          post={post}
-          onUpdate={handlePostUpdate} // ✅ Pass handler to PostCard
-        />
+        <PostCard key={post._id} post={post} onUpdate={handlePostUpdate} />
       ))}
 
-      {loading && (
-        <CircularProgress sx={{ display: "block", mx: "auto", mt: 2 }} />
-      )}
+      {loading && <CircularProgress sx={{ display: "block", mx: "auto", mt: 2 }} />}
 
       {hasMore && !loading && (
-        <Button
-          variant="outlined"
-          fullWidth
-          sx={{ mt: 2 }}
-          onClick={loadMore}
-        >
+        <Button variant="outlined" fullWidth sx={{ mt: 2 }} onClick={loadMore}>
           Load More
         </Button>
       )}
